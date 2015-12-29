@@ -83,8 +83,6 @@ module RailsAdmin
         column = column_parts
       end
 
-      Rails.logger.info "=========================== #{column} #{column_parts}"
-
       reversed_sort = (field ? field.sort_reverse? : model_config.list.sort_reverse?)
       {sort: column, sort_reverse: (params[:sort_reverse] == reversed_sort.to_s)}
     end
