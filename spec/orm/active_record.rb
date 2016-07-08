@@ -28,6 +28,8 @@ class Tableless < ActiveRecord::Base
     end
 
     def column(name, sql_type = nil, default = nil, null = true)
+      define_attribute(name.to_s,
+                       connection.lookup_cast_type(sql_type.to_s)) if ActiveRecord::VERSION::MAJOR >= 5
       columns <<
         if connection.respond_to?(:lookup_cast_type)
           ActiveRecord::ConnectionAdapters::Column.new(name.to_s, default, connection.lookup_cast_type(sql_type.to_s), sql_type.to_s, null)
@@ -49,6 +51,17 @@ class Tableless < ActiveRecord::Base
         a[e[0]] = e[1]
         a
       end
+    end
+
+    def attribute_types
+      @attribute_types ||=
+        Hash[columns.collect { |column| [column.name, lookup_attribute_type(column.type)] }]
+    end
+
+  private
+
+    def lookup_attribute_type(type)
+      ActiveRecord::Type.lookup({datetime: :time}[type] || type)
     end
   end
 
