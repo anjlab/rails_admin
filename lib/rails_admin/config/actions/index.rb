@@ -41,7 +41,7 @@ module RailsAdmin
 
             respond_to do |format|
               format.html do
-                render @action.template_name, status: (flash[:error].present? ? :not_found : 200)
+                render @action.template_name, status: @status_code || :ok
               end
 
               format.json do
@@ -76,6 +76,8 @@ module RailsAdmin
                   send_data output,
                             type: "text/csv; charset=#{encoding}; #{'header=present' if header}",
                             disposition: "attachment; filename=#{params[:model_name]}_#{DateTime.now.strftime('%Y-%m-%d_%Hh%Mm%S')}.csv"
+                elsif Rails.version.to_s >= '5'
+                  render plain: output
                 else
                   render text: output
                 end
