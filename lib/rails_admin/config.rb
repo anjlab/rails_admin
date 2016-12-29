@@ -111,7 +111,7 @@ module RailsAdmin
         extension = args.shift
         if extension
           klass = RailsAdmin::AUDITING_ADAPTERS[extension]
-          klass.setup if klass.respond_to? :setup
+          #klass.setup if klass.respond_to? :setup
           @audit = proc do
             @auditing_adapter = klass.new(*([self] + args).compact)
           end
