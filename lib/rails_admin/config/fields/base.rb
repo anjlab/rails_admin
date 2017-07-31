@@ -81,11 +81,13 @@ module RailsAdmin
           @searchable_columns ||= begin
             case searchable
             when true
-              [{column: "#{abstract_model.table_name}.#{name}", type: type}]
+              table_name = ::ActiveRecord::Base.connection.quote_column_name(abstract_model.table_name)
+              [{column: "#{table_name}.#{name}", type: type}]
             when false
               []
             when :all # valid only for associations
               table_name = associated_model_config.abstract_model.table_name
+              table_name = ::ActiveRecord::Base.connection.quote_column_name(table_name)
               associated_model_config.list.fields.collect { |f| {column: "#{table_name}.#{f.name}", type: f.type} }
             else
               [searchable].flatten.collect do |f|
@@ -105,6 +107,7 @@ module RailsAdmin
                   property = am.properties.detect { |p| p.name == f.to_sym }
                   type = property && property.type
                 end
+                table_name = ::ActiveRecord::Base.connection.quote_column_name(table_name)
                 {column: "#{table_name}.#{column}", type: (type || :string)}
               end
             end
